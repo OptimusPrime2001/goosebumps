@@ -1,6 +1,6 @@
 module trung_go/logger
 
-go 1.24.3
+go 1.24
 
 replace trung_go/greetings => ../greetings
 
