@@ -1,0 +1,29 @@
+name: Go Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code changes
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run Build
+        run: go build ./...
+
+      - name: Run tests
+        run: go test ./...
