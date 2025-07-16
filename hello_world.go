@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-    fmt.Println("Hello, World!")
-    fmt.Println(quote.Hello())
-		fmt.Print(greetings.GetAge(24))
+	fmt.Println("Hello, World!")
+	fmt.Println(quote.Hello())
+	fmt.Print("Log age of Trung", greetings.GetAge(24))
 }
