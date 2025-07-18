@@ -3,6 +3,7 @@ package greetings
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 )
 
 // Hello returns a greeting for the named person.
@@ -16,8 +17,17 @@ func Greetings(name string) (string, error) {
 	// in a greeting message.
 
 	// Return a greeting that embeds the name in a message.
-	message := fmt.Sprintf("Hi there, i'm %v, nice to meet you.", name)
+	message := fmt.Sprintf(randomGreeting(), name)
 	return message, nil
+}
+func randomGreeting() string {
+	listGreeting := []string{
+		"Hello guys, my name is %v",
+		"Nice to meet you, i'm %v",
+		"Is is my pleasure, you can call me %v",
+	}
+	index := rand.Intn(len(listGreeting))
+	return listGreeting[index]
 }
 func GetAge(age int) int {
 	result := age + 2001
