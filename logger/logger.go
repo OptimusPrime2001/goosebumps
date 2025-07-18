@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"trung_go/greetings"
 
@@ -15,7 +16,9 @@ func main() {
 	log.SetFlags(0)
 
 	// Request a greeting message.
-	message, err := greetings.Greetings("")
+	// A slice of names.
+	names := []string{"Gladys", "Samantha", "Darrin"}
+	message, err := greetings.Hellos(names)
 	// If an error was returned, print it to the console and
 	// exit the program.
 	if err != nil {
@@ -24,5 +27,6 @@ func main() {
 
 	// If no error was returned, print the returned message
 	// to the console.
-	fmt.Println("Run logger", message, err)
+	result, _ := json.MarshalIndent(message, "", "  ")
+	fmt.Println("Run module logger: ", string(result), err)
 }
