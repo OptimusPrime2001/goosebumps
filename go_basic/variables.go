@@ -1,7 +1,9 @@
 package main
 
-func main() {
-	var name string = "Trung Le"
+import "fmt"
+
+func Variable() {
+	var fullname string = "Trung Le"
 	var age int = 24
 
 	var score int
@@ -19,6 +21,7 @@ func main() {
 		version  float32 = 1.32
 		isStable bool    = true
 	)
+	fmt.Print(fullname, age, score, isActive, lover, count, active, x, y, z, a, b, name, version, isStable)
 
 	const Pi = 3.14
 	const Greeting = "Hello"

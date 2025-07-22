@@ -21,7 +21,7 @@ func split(sum int) (x, y int) {
 	y = sum - x
 	return
 }
-func main() {
+func Test() {
 	fmt.Println(add(2, 3), calculateAge(2001))
 	a, b := swap("Trung Le", "Họ và tên :")
 	fmt.Println(a, b)
