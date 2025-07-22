@@ -1,5 +1,7 @@
 package main
 
 func main() {
-	Loop2()
+	TestSwitch()
+	SayHello()
+	TestDefer()
 }
