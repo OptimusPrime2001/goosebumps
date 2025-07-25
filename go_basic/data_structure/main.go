@@ -4,4 +4,5 @@ func main() {
 	TestPointer()
 	TestStruct()
 	TestSlice()
+	TestArray()
 }
