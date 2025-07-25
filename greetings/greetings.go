@@ -10,9 +10,8 @@ import (
 func Greetings(name string) (string, error) {
 	// If no name was given, return an error with a message.
 	if name == "" {
-		return "Has error", errors.New("empty name")
+		return "Has error", errors.New("error: please provide name of author")
 	}
-
 	// If a name was received, return a value that embeds the name
 	// in a greeting message.
 
@@ -51,4 +50,16 @@ func randomGreeting() string {
 func GetAge(age int) int {
 	result := age + 2001
 	return result
+}
+
+func randomFormat() string {
+	formats := []string{
+		"Hi,%v. welcome!",
+		"Great to see you, %v!",
+		"Hi there, %v Well met!",
+	}
+	// Return a randomly selected message format by specifying
+	// a random index for the slice of formats.
+	return formats[rand.Intn(len(formats))]
+
 }
