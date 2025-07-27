@@ -5,4 +5,5 @@ func main() {
 	TestStruct()
 	TestSlice()
 	TestArray()
+	TestRange()
 }
