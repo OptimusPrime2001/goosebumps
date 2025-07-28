@@ -6,4 +6,7 @@ func main() {
 	TestSlice()
 	TestArray()
 	TestRange()
+	// ExerciseSlices()
+	TestMap()
+	ExerciseMaps()
 }
