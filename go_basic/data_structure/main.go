@@ -9,4 +9,6 @@ func main() {
 	// ExerciseSlices()
 	TestMap()
 	ExerciseMaps()
+	TestFunc()
+	Finbonaci()
 }
