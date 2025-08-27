@@ -1,8 +1,10 @@
 package main
 
-func main(){
+func main() {
 	// TestGoroutine()
 	// TestChannel()
 	// TestBufferedChannel()
-	TestCloseChannel()
+	// TestCloseChannel()
+	// TestSelect()
+	Exercise()
 }
