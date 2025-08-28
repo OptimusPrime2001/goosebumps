@@ -6,5 +6,7 @@ func main() {
 	// TestBufferedChannel()
 	// TestCloseChannel()
 	// TestSelect()
-	Exercise()
+	// Exercise()
+	// TestMutex()
+	ExerciseMutex()
 }
