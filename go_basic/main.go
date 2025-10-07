@@ -1,7 +1,8 @@
 package main
 
 func main() {
-	TestSwitch()
-	SayHello()
-	TestDefer()
+	// TestSwitch()
+	// SayHello()
+	// TestDefer()
+	TestOperator()
 }
