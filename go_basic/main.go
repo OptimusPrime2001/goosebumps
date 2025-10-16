@@ -4,5 +4,5 @@ func main() {
 	// TestSwitch()
 	// SayHello()
 	// TestDefer()
-	TestOperator()
+	TestOperator(10)
 }

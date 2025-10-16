@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"time"
 )
-func say(s string) {
-	for range 3 {
-		time.Sleep(100 * time.Millisecond)
-		fmt.Println(s)
-	}
+
+func task(id int) {
+	fmt.Printf("Task %d is running\n", id)
+	time.Sleep(1 * time.Second)
+	fmt.Printf("Task %d is done\n", id)
 }
 func TestGoroutine() {
-	go say("Hello Trung")
-	say("Hello World")
+	start := time.Now()
+	task(1)
+	task(2)
+	task(3)
+	fmt.Printf("Total time: %v\n", time.Since(start))
 }

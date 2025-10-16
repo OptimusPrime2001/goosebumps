@@ -1,6 +1,6 @@
 package main
 
 func main() {
-	TestGenerics()
-	TestGenericType(2000)
+	// TestGenerics()
+	TestGenericType(200)
 }
