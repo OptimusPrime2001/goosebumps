@@ -1,14 +1,14 @@
 package main
 
 func main() {
-	TestPointer()
-	TestStruct()
+	// TestPointer()
+	// TestStruct()
 	TestSlice()
-	TestArray()
-	TestRange()
+	// TestArray()
+	// TestRange()
 	// ExerciseSlices()
-	TestMap()
-	ExerciseMaps()
-	TestFunc()
-	Finbonaci()
+	// TestMap()
+	// ExerciseMaps()
+	// TestFunc()
+	// Finbonaci()
 }

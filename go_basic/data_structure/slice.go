@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Human struct {
 	name string
@@ -11,6 +14,13 @@ func TestSlice() {
 	student := []string{
 		"Trung", "My", "Hoat",
 	}
+	Tung := [1]Human{
+		{
+			name: "TrungLe",
+			age:  22,
+		},
+	}
+	fmt.Println("Tung co phai la slice hay khong", reflect.TypeOf(Tung).Kind() == reflect.Slice)
 	friends := make([]string, 4)
 	friends = append(friends, "Name", "Trung", "Darwin", "Robertson")
 	newFriends := friends[4:6]
@@ -43,4 +53,11 @@ func TestSlice() {
 	fmt.Println("After change", a, b, q)
 	fmt.Println(names)
 	fmt.Println(student, len(friends), cap(friends), newFriends)
+
+	str1 := []string{"Apple1", "Apple2", "Apple3"}
+	str2 := []string{"Apple4", "Apple5", "Apple6"}
+	str3 := []string{"Apple7", "Apple8", "Apple9"}
+	str4 := append(str1, str2...)
+	str4 = append(str4, str3...+)
+	fmt.Println(str4)
 }

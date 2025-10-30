@@ -8,5 +8,10 @@ func main() {
 	// TestSelect()
 	// Exercise()
 	// TestMutex()
-	ExerciseMutex()
+	// TestMutextExample()
+	// ExerciseMutex()
+	// TestContext()
+	// TestContextExample()
+	TestConcuDemo()
+
 }
