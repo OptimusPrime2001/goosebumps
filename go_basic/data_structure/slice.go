@@ -58,6 +58,6 @@ func TestSlice() {
 	str2 := []string{"Apple4", "Apple5", "Apple6"}
 	str3 := []string{"Apple7", "Apple8", "Apple9"}
 	str4 := append(str1, str2...)
-	str4 = append(str4, str3...+)
+	str4 = append(str4, str3...)
 	fmt.Println(str4)
 }
