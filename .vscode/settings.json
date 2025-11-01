@@ -1,0 +1,18 @@
+{
+  // Tự động format và sắp xếp import khi Ctrl+S
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  },
+
+  // Dùng gopls (Go language server) để đề xuất import package chưa import
+  "go.useLanguageServer": true,
+  "gopls": {
+    // Hiện codelens trong go.mod để chạy tidy/upgrade dễ dàng
+    "ui.codelenses": {
+      "tidy": true,
+      "upgrade_dependency": true,
+      "vendor": true
+    }
+  }
+}

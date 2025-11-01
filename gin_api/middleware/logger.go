@@ -1,24 +1,23 @@
 package middleware
 
 import (
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
 )
 
 func LoggerMiddleware() gin.HandlerFunc {
 	logPath := "logs/https.log"
-	if err := os.MkdirAll(filepath.Dir(logPath), os.ModePerm); err != nil {
-		panic(err)
-	}
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		panic(err)
-	}
-	logger := zerolog.New(logFile).With().Timestamp().Logger()
+	logger := zerolog.New(&lumberjack.Logger{
+		Filename:   logPath,
+		MaxSize:    1, // megabytes
+		MaxBackups: 5,
+		MaxAge:     30, // days
+		Compress:   true,
+		LocalTime:  true,
+	}).With().Timestamp().Logger()
 	// TODO: implement logger
 	return func(ctx *gin.Context) {
 		start := time.Now()
