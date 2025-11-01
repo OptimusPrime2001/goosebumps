@@ -27,19 +27,19 @@ func getClientIP(ctx *gin.Context) string {
 	return ip
 }
 func getRateLimiter(ip string) *rate.Limiter {
-	mu.Lock()
-	defer mu.Unlock()
-	// TODO: implement rate limit
-	client, exists := clients[ip]
-	if !exists {
-		newClient := &Client{
-			limiter:         rate.NewLimiter(5, 15), // 5 request/sec, brust 10
-			lastRequestTime: time.Now(),
-		}
-		clients[ip] = newClient
-	}
-	client.lastRequestTime = time.Now()
-	return client.limiter
+    mu.Lock()
+    defer mu.Unlock()
+    // TODO: implement rate limit
+    client, exists := clients[ip]
+    if !exists {
+        client = &Client{
+            limiter:         rate.NewLimiter(5, 15), // 5 req/sec, burst 15
+            lastRequestTime: time.Now(),
+        }
+        clients[ip] = client
+    }
+    client.lastRequestTime = time.Now()
+    return client.limiter
 }
 
 func CleanupRateLimiters() {
@@ -57,7 +57,6 @@ func CleanupRateLimiters() {
 	// TODO: implement rate limit
 }
 
-// hey -n 20 -c 1 -H "X-API-Key:ab2a7a8a-d601-4bf7-b0e2-dd00e5459392" http://localhost:8080/api/v1/categories/golang
 func RateLimitMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// TODO: implement rate limit
