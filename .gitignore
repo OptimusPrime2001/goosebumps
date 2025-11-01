@@ -1,1 +1,6 @@
 .env
+
+# Ignore Gin API build artifacts and logs
+gin_api/tmp/
+gin_api/logs/
+*.log
