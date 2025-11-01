@@ -1,0 +1,1 @@
+// hey -n 20 -c 1 -H "X-API-Key:ab2a7a8a-d601-4bf7-b0e2-dd00e5459392" http://localhost:8080/api/v1/categories/golang
