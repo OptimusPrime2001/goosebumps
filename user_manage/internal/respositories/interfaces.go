@@ -3,9 +3,10 @@ package repositories
 import "user-manage-backend/internal/models"
 
 type UserRepository interface {
-	FindAll()
+	FindAll() []models.Users
+	FindBySearch(search string) []models.Users
 	Create(user models.Users) error
-	FindByUUID()
+	FindByUUID(uuid string) (models.Users, bool)
 	Update()
 	Delete()
 	FindEmail(email string) bool

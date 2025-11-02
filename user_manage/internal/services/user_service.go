@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+	"user-manage-backend/internal/dto"
 	"user-manage-backend/internal/models"
 	repositories "user-manage-backend/internal/respositories"
 	"user-manage-backend/internal/utils"
@@ -19,7 +21,12 @@ func NewUserService(repo repositories.UserRepository) UserService {
 	}
 }
 
-func (userService *userService) GetAllUsers() {
+func (userService *userService) GetAllUsers(query dto.GetListUserQueryParams) []models.Users {
+	log.Printf("query: %v", query)
+	if query.Search != "" {
+		return userService.repo.FindBySearch(query.Search)
+	}
+	return userService.repo.FindAll()
 }
 func (userService *userService) CreateUser(user models.Users) (models.Users, error) {
 	user.Email = utils.NormalizeString(user.Email)
@@ -36,6 +43,13 @@ func (userService *userService) CreateUser(user models.Users) (models.Users, err
 		return models.Users{}, utils.WrapAppError(err, "failed to create user", utils.ErrCodeInternal)
 	}
 	return user, nil
+}
+func (userService *userService) GetUserByUUID(uuid string) (models.Users, bool) {
+	user, found := userService.repo.FindByUUID(uuid)
+	if !found {
+		return models.Users{}, false
+	}
+	return user, true
 }
 func (userService *userService) UpdateUser() {
 }
