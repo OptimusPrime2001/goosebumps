@@ -15,9 +15,13 @@ func NewUserRoute(controller *controllers.UserController) *UserRoute {
 		controller: controller,
 	}
 }
-func (userRoute *UserRoute) Register(server *gin.RouterGroup) {
-	users := server.Group("/users")
+func (userRoute *UserRoute) Register(routerGroup *gin.RouterGroup) {
+	users := routerGroup.Group("/users")
 	{
-		users.POST("", userRoute.controller.CreateUser)
+		users.POST("/create", userRoute.controller.CreateNewUser)
+		users.GET("", userRoute.controller.GetAllUsers)
+		users.GET("/:uuid", userRoute.controller.GetUserByUUID)
+		users.PUT("/:uuid", userRoute.controller.UpdateUser)
+		users.DELETE("/:uuid", userRoute.controller.DeleteUser)
 	}
 }

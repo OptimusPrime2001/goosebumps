@@ -1,14 +1,19 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"user-manage-backend/internal/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Route interface {
-	Register(server *gin.RouterGroup)
+	Register(routerGroup *gin.RouterGroup)
 }
 
-func RegisterRoutes(server *gin.Engine, routes ...Route) {
-	api := server.Group("/api/v1")
+func RegisterRoutes(engine *gin.Engine, routes ...Route) {
+	engine.Use(middlewares.LoggerMiddleware(), middlewares.RateLimitMiddleware(), middlewares.ApiKeyMiddleware())
+	routerGroup := engine.Group("/api/v1")
 	for _, route := range routes {
-		route.Register(api)
+		route.Register(routerGroup)
 	}
 }
