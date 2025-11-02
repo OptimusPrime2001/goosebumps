@@ -7,22 +7,22 @@ import (
 )
 
 func ResponseError(ctx *gin.Context, err error) {
-    if appErr, ok := err.(*AppError); ok {
-        statusCode := httpStatusFromErrorCode(appErr.Code)
-        response := gin.H{
-            "code": appErr.Code,
-            "msg":  appErr.Message,
-        }
-        if appErr.Err != nil {
-            response["detail"] = appErr.Err.Error()
-        }
-        ctx.AbortWithStatusJSON(statusCode, response)
-        return
-    }
-    ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-        "code": ErrCodeInternal,
-        "msg":  err.Error(),
-    })
+	if appErr, ok := err.(*AppError); ok {
+		statusCode := httpStatusFromErrorCode(appErr.Code)
+		response := gin.H{
+			"code": appErr.Code,
+			"msg":  appErr.Message,
+		}
+		if appErr.Err != nil {
+			response["detail"] = appErr.Err.Error()
+		}
+		ctx.AbortWithStatusJSON(statusCode, response)
+		return
+	}
+	ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+		"code": ErrCodeInternal,
+		"msg":  err.Error(),
+	})
 }
 
 func ResponseSuccess(ctx *gin.Context, status int, data any) {
@@ -31,4 +31,7 @@ func ResponseSuccess(ctx *gin.Context, status int, data any) {
 		"msg":  "success",
 		"data": data,
 	})
+}
+func ResponseValidator(ctx *gin.Context, data any) {
+	ctx.JSON(http.StatusBadRequest, data)
 }
