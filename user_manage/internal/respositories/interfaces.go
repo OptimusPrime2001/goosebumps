@@ -7,7 +7,7 @@ type UserRepository interface {
 	FindBySearch(search string) []models.Users
 	Create(user models.Users) error
 	FindByUUID(uuid string) (models.Users, bool)
-	Update()
-	Delete()
+	Update(uuid string, user models.Users) error
+	Delete(uuid string) error
 	FindEmail(email string) bool
 }

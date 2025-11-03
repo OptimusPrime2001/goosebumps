@@ -4,7 +4,7 @@ import "user-manage-backend/internal/models"
 
 // --- Param struct ---
 type UserParam struct {
-	UUID string `uri:"id" binding:"uuid"`
+	UUID string `uri:"uuid" binding:"uuid"`
 }
 
 // --- Query struct ---

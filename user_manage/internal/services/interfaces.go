@@ -9,6 +9,6 @@ type UserService interface {
 	GetAllUsers(query dto.GetListUserQueryParams) []models.Users
 	GetUserByUUID(uuid string) (models.Users, bool)
 	CreateUser(user models.Users) (models.Users, error)
-	UpdateUser()
-	DeleteUser()
+	UpdateUser(uuid string, user models.Users) (models.Users, error)
+	DeleteUser(uuid string) error
 }

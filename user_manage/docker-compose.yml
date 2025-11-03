@@ -1,0 +1,17 @@
+
+services: 
+  db:
+    image: postgres:17
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+     POSTGRES_DB: goosebumps_db
+     POSTGRES_USER: goosebumps
+     POSTGRES_PASSWORD: goosebumps
+     TZ: Asia/Ho_Chi_Minh
+    ports:
+     - 5433:5432
+    volumes:
+     - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

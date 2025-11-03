@@ -43,6 +43,7 @@ func (userController *UserController) GetUserByUUID(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
+	fmt.Printf("params: %v\n", params)
 	user, err := userController.service.GetUserByUUID(params.UUID)
 	if !err {
 		utils.ResponseError(ctx, utils.NewError("user not found", utils.ErrCodeNotFound))
@@ -58,7 +59,12 @@ func (userController *UserController) GetAllUsers(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-
+	if query.Page <= 0 {
+		query.Page = 1
+	}
+	if query.Limit <= 0 {
+		query.Limit = 5
+	}
 	users := userController.service.GetAllUsers(query)
 	if len(users) == 0 {
 		utils.ResponseError(ctx, utils.NewError("users not found", utils.ErrCodeNotFound))
@@ -68,8 +74,33 @@ func (userController *UserController) GetAllUsers(ctx *gin.Context) {
 	utils.ResponseSuccess(ctx, http.StatusOK, &userDTOs)
 }
 func (userController *UserController) UpdateUser(ctx *gin.Context) {
-
+	var params dto.UserParam
+	if err := ctx.ShouldBindUri(&params); err != nil {
+		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
+		return
+	}
+	var user models.Users
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
+		return
+	}
+	user, err := userController.service.UpdateUser(params.UUID, user)
+	if err != nil {
+		utils.ResponseError(ctx, err)
+		return
+	}
+	userDTO := dto.MapUserToDTO(user)
+	utils.ResponseSuccess(ctx, http.StatusOK, &userDTO)
 }
 func (userController *UserController) DeleteUser(ctx *gin.Context) {
-
+	var params dto.UserParam
+	if err := ctx.ShouldBindUri(&params); err != nil {
+		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
+		return
+	}
+	if err := userController.service.DeleteUser(params.UUID); err != nil {
+		utils.ResponseError(ctx, err)
+		return
+	}
+	utils.ResponseSuccess(ctx, http.StatusNoContent, nil)
 }

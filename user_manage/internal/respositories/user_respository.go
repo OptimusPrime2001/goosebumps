@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 	"user-manage-backend/internal/models"
+	"user-manage-backend/internal/utils"
 
 	"github.com/samber/lo"
 )
@@ -37,11 +38,26 @@ func (user_repo *userRepository) FindByUUID(uuid string) (models.Users, bool) {
 	}
 	return models.Users{}, false
 }
-func (user_repo *userRepository) Update() {
+func (user_repo *userRepository) Update(uuid string, newUser models.Users) error {
 	// TODO: implement method
+	_, index, ok := lo.FindIndexOf(user_repo.users, func(u models.Users) bool {
+		return u.UUID == uuid
+	})
+	if !ok {
+		return utils.NewError("user not found", utils.ErrCodeNotFound)
+	}
+	user_repo.users[index] = newUser
+	return nil
 }
-func (user_repo *userRepository) Delete() {
+func (user_repo *userRepository) Delete(uuid string) error {
 	// TODO: implement method
+	for i, u := range user_repo.users {
+		if u.UUID == uuid {
+			user_repo.users = append(user_repo.users[:i], user_repo.users[i+1:]...)
+			return nil
+		}
+	}
+	return utils.NewError("user not found", utils.ErrCodeNotFound)
 }
 func (user_repo *userRepository) FindEmail(email string) bool {
 	// TODO: implement method

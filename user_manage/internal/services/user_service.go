@@ -1,7 +1,6 @@
 package services
 
 import (
-	"log"
 	"user-manage-backend/internal/dto"
 	"user-manage-backend/internal/models"
 	repositories "user-manage-backend/internal/respositories"
@@ -22,11 +21,22 @@ func NewUserService(repo repositories.UserRepository) UserService {
 }
 
 func (userService *userService) GetAllUsers(query dto.GetListUserQueryParams) []models.Users {
-	log.Printf("query: %v", query)
+	var filteredUsers []models.Users
 	if query.Search != "" {
-		return userService.repo.FindBySearch(query.Search)
+		filteredUsers = userService.repo.FindBySearch(query.Search)
+	} else {
+		filteredUsers = userService.repo.FindAll()
 	}
-	return userService.repo.FindAll()
+
+	start := (query.Page - 1) * query.Limit
+	end := start + query.Limit
+	if start >= len(filteredUsers) {
+		return []models.Users{}
+	}
+	if end > len(filteredUsers) {
+		end = len(filteredUsers)
+	}
+	return filteredUsers[start:end]
 }
 func (userService *userService) CreateUser(user models.Users) (models.Users, error) {
 	user.Email = utils.NormalizeString(user.Email)
@@ -51,7 +61,28 @@ func (userService *userService) GetUserByUUID(uuid string) (models.Users, bool) 
 	}
 	return user, true
 }
-func (userService *userService) UpdateUser() {
+func (userService *userService) UpdateUser(uuid string, user models.Users) (models.Users, error) {
+	user.Email = utils.NormalizeString(user.Email)
+	if exist := userService.repo.FindEmail(user.Email); exist {
+		return models.Users{}, utils.NewError("email already exists", utils.ErrCodeConflict)
+	}
+	currentUser, found := userService.repo.FindByUUID(uuid)
+	if !found {
+		return models.Users{}, utils.NewError("user not found", utils.ErrCodeNotFound)
+	}
+	currentUser.Email = user.Email
+	currentUser.Username = user.Username
+	currentUser.Age = user.Age
+	currentUser.Level = user.Level
+	currentUser.Status = user.Status
+	if err := userService.repo.Update(uuid, currentUser); err != nil {
+		return models.Users{}, utils.WrapAppError(err, "failed to update user", utils.ErrCodeInternal)
+	}
+	return currentUser, nil
 }
-func (userService *userService) DeleteUser() {
+func (userService *userService) DeleteUser(uuid string) error {
+	if err := userService.repo.Delete(uuid); err != nil {
+		return utils.WrapAppError(err, "failed to delete user", utils.ErrCodeInternal)
+	}
+	return nil
 }
