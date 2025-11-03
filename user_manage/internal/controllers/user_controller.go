@@ -43,7 +43,6 @@ func (userController *UserController) GetUserByUUID(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	fmt.Printf("params: %v\n", params)
 	user, err := userController.service.GetUserByUUID(params.UUID)
 	if !err {
 		utils.ResponseError(ctx, utils.NewError("user not found", utils.ErrCodeNotFound))
