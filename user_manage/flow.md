@@ -18,3 +18,8 @@ Command DB :
    docker exec -i postgres_db psql -U trung_db -d user_manage < user_manage.sql
 - export-db:
    docker exec -i postgres_db psql -U trung_db -d user_manage > user_manage.sql
+
+Migrate DB:
+- migrate create -ext sql -dir internal/db/migrations -seq users
+
+- migrate -path internal/db/migrations --database "postgres://trung_db:trung2001@@localhost:5433/user_manage?sslmode=disable" up
