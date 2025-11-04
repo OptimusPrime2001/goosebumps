@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 	"user-manage-backend/internal/configs"
+	"user-manage-backend/internal/db"
 	"user-manage-backend/internal/routes"
 	"user-manage-backend/internal/validations"
 
@@ -24,8 +25,11 @@ func NewApplication(config *configs.Config) *Application {
 	}
 	engine := gin.Default()
 	loadEnv()
+	if err := db.InitDb(); err != nil {
+		log.Fatal("unable to connnect to db")
+	}
 	modules := []Module{
-		NewUserModule(),
+		NewUserModule(db.DB),
 	}
 	routes.RegisterRoutes(engine, getModuleRoutes(modules)...)
 	return &Application{

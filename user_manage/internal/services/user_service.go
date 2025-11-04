@@ -25,7 +25,11 @@ func (userService *userService) GetAllUsers(query dto.GetListUserQueryParams) []
 	if query.Search != "" {
 		filteredUsers = userService.repo.FindBySearch(query.Search)
 	} else {
-		filteredUsers = userService.repo.FindAll()
+		var err error
+		filteredUsers, err = userService.repo.FindAll()
+		if err != nil {
+			return []models.Users{}
+		}
 	}
 
 	start := (query.Page - 1) * query.Limit

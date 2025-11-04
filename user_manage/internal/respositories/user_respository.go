@@ -2,81 +2,88 @@ package repositories
 
 import (
 	"log"
-	"strings"
 	"user-manage-backend/internal/models"
 	"user-manage-backend/internal/utils"
 
-	"github.com/samber/lo"
+	"gorm.io/gorm"
 )
 
 type userRepository struct {
-	users []models.Users
+	db *gorm.DB
 	// TODO: implement repository methods
 }
 
-func NewUserRepository() UserRepository {
+func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{
-		users: make([]models.Users, 0),
+		db: db,
 	}
 }
 
 func (user_repo *userRepository) Create(user models.Users) error {
 	// TODO: implement method
-	user_repo.users = append(user_repo.users, user)
+	if err := user_repo.db.Create(&user).Error; err != nil {
+		return utils.NewError("failed to create user", utils.ErrCodeInternal)
+	}
 	return nil
 }
-func (user_repo *userRepository) FindAll() []models.Users {
+func (user_repo *userRepository) FindAll() ([]models.Users, error) {
 	// TODO: implement method
-	return user_repo.users
+	var users []models.Users
+	if err := user_repo.db.Find(&users).Error; err != nil {
+		return users, utils.NewError("failed to find users", utils.ErrCodeInternal)
+	}
+	return users, nil
 }
 func (user_repo *userRepository) FindByUUID(uuid string) (models.Users, bool) {
 	// TODO: implement method
-	for _, user := range user_repo.users {
-		if user.UUID == uuid {
-			return user, true
-		}
+	var user models.Users
+	if err := user_repo.db.Where("user_id = ?", uuid).First(&user).Error; err != nil {
+		return models.Users{}, false
 	}
-	return models.Users{}, false
+	return user, true
 }
 func (user_repo *userRepository) Update(uuid string, newUser models.Users) error {
-	// TODO: implement method
-	_, index, ok := lo.FindIndexOf(user_repo.users, func(u models.Users) bool {
-		return u.UUID == uuid
-	})
-	if !ok {
+	var user models.Users
+	if err := user_repo.db.Where("user_id = ?", uuid).First(&user).Error; err != nil {
 		return utils.NewError("user not found", utils.ErrCodeNotFound)
 	}
-	user_repo.users[index] = newUser
+	if err := user_repo.db.Model(&user).Updates(newUser).Error; err != nil {
+		return utils.NewError("failed to update user", utils.ErrCodeInternal)
+	}
 	return nil
 }
 func (user_repo *userRepository) Delete(uuid string) error {
-	// TODO: implement method
-	for i, u := range user_repo.users {
-		if u.UUID == uuid {
-			user_repo.users = append(user_repo.users[:i], user_repo.users[i+1:]...)
-			return nil
-		}
+	var user models.Users
+	if err := user_repo.db.Where("user_id = ?", uuid).First(&user).Error; err != nil {
+		return utils.NewError("user not found", utils.ErrCodeNotFound)
 	}
-	return utils.NewError("user not found", utils.ErrCodeNotFound)
+	if err := user_repo.db.Delete(&user).Error; err != nil {
+		return utils.NewError("failed to delete user", utils.ErrCodeInternal)
+	}
+	return nil
 }
 func (user_repo *userRepository) FindEmail(email string) bool {
 	// TODO: implement method
-	for _, user := range user_repo.users {
-		if user.Email == email {
-			return true
-		}
+	var user models.Users
+	if err := user_repo.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return false
 	}
-	return false
+	return true
 }
 func (user_repo *userRepository) FindBySearch(search string) []models.Users {
 	// TODO: implement method
 	if search != "" {
-		filteredUsers := lo.Filter(user_repo.users, func(user models.Users, index int) bool {
-			return strings.Contains(user.Username, search)
-		})
-		log.Printf("search: %s,users: %v, filteredUsers: %v", search, user_repo.users, filteredUsers)
+		var filteredUsers []models.Users
+		if err := user_repo.db.Where("username LIKE ?", "%"+search+"%").Find(&filteredUsers).Error; err != nil {
+			return filteredUsers
+		}
+		log.Printf("search: %s, filteredUsers: %v", search, filteredUsers)
 		return filteredUsers
 	} else {
-		return user_repo.users
+		var users []models.Users
+		if err := user_repo.db.Find(&users).Error; err != nil {
+			return users
+		}
+		return users
 	}
 }
