@@ -25,9 +25,7 @@ func NewApplication(config *configs.Config) *Application {
 	}
 	engine := gin.Default()
 	loadEnv()
-	if err := db.InitDb(); err != nil {
-		log.Fatal("unable to connnect to db")
-	}
+
 	modules := []Module{
 		NewUserModule(db.DB),
 	}

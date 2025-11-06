@@ -1,13 +1,16 @@
 package repositories
 
-import "user-manage-backend/internal/models"
+import (
+	"context"
+	"user-manage-backend/internal/db/sqlc"
+)
 
 type UserRepository interface {
-	FindAll() ([]models.Users, error)
-	FindBySearch(search string) []models.Users
-	Create(user models.Users) error
-	FindByUUID(uuid string) (models.Users, bool)
-	Update(uuid string, user models.Users) error
-	Delete(uuid string) error
-	FindEmail(email string) bool
+	FindAll(ctx context.Context) ([]sqlc.User, error)
+	FindBySearch(ctx context.Context, search string) []sqlc.User
+	Create(ctx context.Context, user sqlc.CreateUserParams) (sqlc.User, error)
+	FindByUUID(ctx context.Context, uuid string) (sqlc.User, bool)
+	Update(ctx context.Context, uuid string, user sqlc.User) error
+	Delete(ctx context.Context, uuid string) error
+	FindEmail(ctx context.Context, email string) bool
 }

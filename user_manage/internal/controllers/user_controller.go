@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"user-manage-backend/internal/db/sqlc"
 	"user-manage-backend/internal/dto"
 	"user-manage-backend/internal/models"
 	"user-manage-backend/internal/services"
@@ -23,12 +24,12 @@ func NewUserController(service services.UserService) *UserController {
 }
 
 func (userController *UserController) CreateNewUser(ctx *gin.Context) {
-	var user models.Users
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var input sqlc.CreateUserParams
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	user, err := userController.service.CreateUser(user)
+	user, err := userController.service.CreateUser(ctx, input)
 	if err != nil {
 		fmt.Println("error:", err)
 		utils.ResponseError(ctx, err)

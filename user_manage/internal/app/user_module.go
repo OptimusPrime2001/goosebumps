@@ -2,18 +2,17 @@ package app
 
 import (
 	"user-manage-backend/internal/controllers"
+	"user-manage-backend/internal/db/sqlc"
 	repositories "user-manage-backend/internal/respositories"
 	"user-manage-backend/internal/routes"
 	"user-manage-backend/internal/services"
-
-	"gorm.io/gorm"
 )
 
 type UserModule struct {
 	routes routes.Route
 }
 
-func NewUserModule(db *gorm.DB) *UserModule {
+func NewUserModule(db *sqlc.Queries) *UserModule {
 
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)

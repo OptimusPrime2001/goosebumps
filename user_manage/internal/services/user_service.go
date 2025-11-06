@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+	"user-manage-backend/internal/db/sqlc"
 	"user-manage-backend/internal/dto"
 	"user-manage-backend/internal/models"
 	repositories "user-manage-backend/internal/respositories"
@@ -42,7 +44,7 @@ func (userService *userService) GetAllUsers(query dto.GetListUserQueryParams) []
 	}
 	return filteredUsers[start:end]
 }
-func (userService *userService) CreateUser(user models.Users) (models.Users, error) {
+func (userService *userService) CreateUser(ctx context.Context, user sqlc.CreateUserParams) (models.Users, error) {
 	user.Email = utils.NormalizeString(user.Email)
 	if exist := userService.repo.FindEmail(user.Email); exist {
 		return models.Users{}, utils.NewError("email already exists", utils.ErrCodeConflict)
