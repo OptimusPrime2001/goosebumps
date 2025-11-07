@@ -3,6 +3,9 @@ export
 
 MIGRATE_PATH=internal/db/migrations
 CONN_STR=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
+sqlc:
+	sqlc generate
+
 # Import database 
 importdb:
 	docker exec -i postgres_db psql -U $(DB_USER) -d $(DB_NAME) < user_manage.sql
@@ -32,4 +35,7 @@ migrate-drop:
 migrate-go:
 	migrate -path $(MIGRATE_PATH) --database $(CONN_STR) goto $(VERSION)
 
-.PHONY: importdb exportdb migrate-create migrate-up migrate-down migrate-force migrate-drop migrate-go
+make server:
+	air
+
+.PHONY: importdb exportdb migrate-create migrate-up migrate-down migrate-force migrate-drop migrate-go sqlc server

@@ -4,13 +4,12 @@ import (
 	"context"
 	"user-manage-backend/internal/db/sqlc"
 	"user-manage-backend/internal/dto"
-	"user-manage-backend/internal/models"
 )
 
 type UserService interface {
-	GetAllUsers(query dto.GetListUserQueryParams) []models.Users
-	GetUserByUUID(uuid string) (models.Users, bool)
-	CreateUser(ctx context.Context, user sqlc.CreateUserParams) (models.Users, error)
-	UpdateUser(ctx context.Context, uuid string, user models.Users) (models.Users, error)
+	GetAllUsers(ctx context.Context, query dto.GetListUserQueryParams) []sqlc.User
+	GetUserByUUID(ctx context.Context, uuid string) (sqlc.User, bool)
+	CreateUser(ctx context.Context, user sqlc.CreateUserParams) (sqlc.User, error)
+	UpdateUser(ctx context.Context, uuid string, user sqlc.CreateUserParams) (sqlc.User, error)
 	DeleteUser(ctx context.Context, uuid string) error
 }

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"user-manage-backend/internal/db/sqlc"
 	"user-manage-backend/internal/dto"
-	"user-manage-backend/internal/models"
 	"user-manage-backend/internal/services"
 	"user-manage-backend/internal/utils"
 	"user-manage-backend/internal/validations"
@@ -44,7 +43,7 @@ func (userController *UserController) GetUserByUUID(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	user, err := userController.service.GetUserByUUID(params.UUID)
+	user, err := userController.service.GetUserByUUID(ctx, params.UUID)
 	if !err {
 		utils.ResponseError(ctx, utils.NewError("user not found", utils.ErrCodeNotFound))
 		return
@@ -65,7 +64,8 @@ func (userController *UserController) GetAllUsers(ctx *gin.Context) {
 	if query.Limit <= 0 {
 		query.Limit = 5
 	}
-	users := userController.service.GetAllUsers(query)
+	users := userController.service.GetAllUsers(ctx, query)
+
 	if len(users) == 0 {
 		utils.ResponseError(ctx, utils.NewError("users not found", utils.ErrCodeNotFound))
 		return
@@ -79,12 +79,12 @@ func (userController *UserController) UpdateUser(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	var user models.Users
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var input sqlc.CreateUserParams
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	user, err := userController.service.UpdateUser(params.UUID, user)
+	user, err := userController.service.UpdateUser(ctx, params.UUID, input)
 	if err != nil {
 		utils.ResponseError(ctx, err)
 		return
@@ -98,7 +98,7 @@ func (userController *UserController) DeleteUser(ctx *gin.Context) {
 		utils.ResponseValidator(ctx, validations.HandleValidationErrors(err))
 		return
 	}
-	if err := userController.service.DeleteUser(params.UUID); err != nil {
+	if err := userController.service.DeleteUser(ctx, params.UUID); err != nil {
 		utils.ResponseError(ctx, err)
 		return
 	}

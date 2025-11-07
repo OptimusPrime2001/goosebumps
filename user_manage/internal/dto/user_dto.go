@@ -1,6 +1,8 @@
 package dto
 
-import "user-manage-backend/internal/models"
+import (
+	"user-manage-backend/internal/db/sqlc"
+)
 
 // --- Param struct ---
 type UserParam struct {
@@ -23,17 +25,17 @@ type UserDTO struct {
 	Level    string `json:"level"`
 }
 
-func MapUserToDTO(user models.Users) *UserDTO {
+func MapUserToDTO(user sqlc.User) *UserDTO {
 	return &UserDTO{
-		UUID:     user.UUID,
+		UUID:     user.UserID.String(),
 		Username: user.Username,
 		Email:    user.Email,
-		Age:      user.Age,
-		Status:   MapStatusText(user.Status),
-		Level:    MapLevelText(user.Level),
+		Age:      int(user.Age.Int32),
+		Status:   MapStatusText(int(user.Status.Int32)),
+		Level:    MapLevelText(int(user.Level.Int32)),
 	}
 }
-func MapUsersToDTOs(users []models.Users) []*UserDTO {
+func MapUsersToDTOs(users []sqlc.User) []*UserDTO {
 	userDTOs := make([]*UserDTO, 0)
 	for _, user := range users {
 		userDTOs = append(userDTOs, MapUserToDTO(user))

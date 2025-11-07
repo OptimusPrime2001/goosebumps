@@ -1,7 +1,13 @@
 package app
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"user-manage-backend/internal/configs"
 	"user-manage-backend/internal/db"
 	"user-manage-backend/internal/routes"
@@ -37,7 +43,27 @@ func NewApplication(config *configs.Config) *Application {
 }
 
 func (app *Application) Run() error {
-	return app.engine.Run(app.config.ServerAddress)
+
+	server := &http.Server{
+		Addr:    app.config.ServerAddress,
+		Handler: app.engine,
+	}
+	quick := make(chan os.Signal, 1)
+	signal.Notify(quick, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	go func() {
+		log.Printf("✅ Server is running on %s", app.config.ServerAddress)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server listen and serve failed: %v", err)
+		}
+	}()
+	<-quick
+	log.Println("⚠️ Shutdown signal received")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("⚠️ Server force to shutdown failed: %v", err)
+	}
+	return nil
 }
 func getModuleRoutes(modules []Module) []routes.Route {
 	routeList := make([]routes.Route, len(modules))

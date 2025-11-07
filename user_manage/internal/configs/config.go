@@ -20,7 +20,7 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		ServerAddress: "127.0.0.1:8080",
+		ServerAddress: utils.GetEnv("SERVER_ADDRESS", "127.0.0.1:8080"),
 		Database: DatabaseConfig{
 			Host:     utils.GetEnv("DB_HOST", "127.0.0.1"),
 			Port:     utils.GetEnv("DB_PORT", "5432"),

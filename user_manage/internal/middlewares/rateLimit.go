@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"golang.org/x/time/rate"
 )
 
@@ -57,7 +58,7 @@ func CleanupRateLimiters() {
 	// TODO: implement rate limit
 }
 
-func RateLimitMiddleware() gin.HandlerFunc {
+func RateLimitMiddleware(logger *zerolog.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// TODO: implement rate limit
 		ip := getClientIP(ctx)
