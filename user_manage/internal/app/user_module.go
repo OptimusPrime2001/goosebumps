@@ -12,7 +12,7 @@ type UserModule struct {
 	routes routes.Route
 }
 
-func NewUserModule(db *sqlc.Queries) *UserModule {
+func NewUserModule(db sqlc.Querier) *UserModule {
 
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)

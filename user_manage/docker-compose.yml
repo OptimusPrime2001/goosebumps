@@ -12,5 +12,23 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
+  redis:
+    image: redis:8.0-alpine
+    container_name: redis_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${REDIS_DB}
+      POSTGRES_USER: ${REDIS_USER}
+      POSTGRES_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./system/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    ports:
+      - 6379:6379
 volumes:
   db_data:
+  redis_data:
+networks:
+  app-network:
+    driver: bridge

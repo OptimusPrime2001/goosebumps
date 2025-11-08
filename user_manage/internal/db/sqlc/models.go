@@ -8,24 +8,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Profile struct {
-	ProfileID int32       `json:"profile_id"`
-	UserID    uuid.UUID   `json:"user_id"`
-	Phone     pgtype.Text `json:"phone"`
-	Address   pgtype.Text `json:"address"`
-}
-
 type User struct {
-	UserID    uuid.UUID   `json:"user_id"`
-	Username  string      `json:"username"`
-	Email     string      `json:"email"`
-	CreatedAt time.Time   `json:"created_at"`
-	Phone     pgtype.Text `json:"phone"`
-	Age       pgtype.Int4 `json:"age"`
-	Password  pgtype.Text `json:"password"`
-	Status    pgtype.Int4 `json:"status"`
-	Level     pgtype.Int4 `json:"level"`
+	UserID       int32     `json:"user_id"`
+	ID           uuid.UUID `json:"id"`
+	UserEmail    string    `json:"user_email"`
+	UserPassword string    `json:"user_password"`
+	UserFullName string    `json:"user_full_name"`
+	// user age must be between 1 and 100
+	UserAge *int32 `json:"user_age"`
+	// 1: active, 2: inactive, 3: deleted
+	UserStatus int32     `json:"user_status"`
+	UserLevel  int32     `json:"user_level"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdateAt   time.Time `json:"update_at"`
+	DeleteAt   time.Time `json:"delete_at"`
 }

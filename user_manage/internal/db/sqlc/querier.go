@@ -12,7 +12,10 @@ import (
 
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	GetUserByID(ctx context.Context, userID uuid.UUID) (User, error)
+	RestoreUser(ctx context.Context, userID uuid.UUID) (User, error)
+	SoftDeleteUser(ctx context.Context, userID uuid.UUID) (User, error)
+	TrashUsers(ctx context.Context) (User, error)
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

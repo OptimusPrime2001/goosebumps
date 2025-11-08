@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
 	"user-manage-backend/internal/configs"
 	"user-manage-backend/internal/db/sqlc"
@@ -17,10 +18,43 @@ import (
 
 // var DB *sql.DB
 // var DB *gorm.DB
-var DB *sqlc.Queries
+var DB sqlc.Querier
 
 func InitDb() {
-	Database_SQLC()
+	CONNECT_SUPABASE()
+}
+func CONNECT_SUPABASE() {
+	databaseURL := os.Getenv("DATABASE_URL")
+	conf, err := pgxpool.ParseConfig(databaseURL)
+	if err != nil {
+		log.Fatalf("Failed to parse config: %v", err)
+	}
+	conf.MaxConns = 50
+	conf.MaxConnLifetime = 30 * time.Minute
+	conf.MaxConnIdleTime = 5 * time.Minute
+	conf.MinConns = 5
+	conf.HealthCheckPeriod = 1 * time.Minute
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	pool, err := pgxpool.NewWithConfig(ctx, conf)
+	if err != nil {
+		pool.Close()
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	sqlc.New(pool)
+	if err := pool.Ping(ctx); err != nil {
+		pool.Close()
+		log.Fatalf("Failed to ping database: %v", err)
+	}
+	log.Println("Connect postgres database using pgxpool success ✅")
+
+	// Example query to test connection
+	var version string
+	if err := pool.QueryRow(ctx, "SELECT version()").Scan(&version); err != nil {
+		log.Fatalf("Query failed: %v", err)
+	}
+
+	log.Println("Connected to:", version)
 }
 func Database_SQLC() {
 	connStr := configs.NewConfig().GetDSN()

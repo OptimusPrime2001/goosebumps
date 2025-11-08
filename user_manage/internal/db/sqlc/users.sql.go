@@ -9,66 +9,187 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (user_id, username, email, age, password, status, level)
-VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING user_id, username, email, created_at, phone, age, password, status, level
+INSERT INTO users(
+  user_email,
+  user_password,
+  user_full_name,
+  user_age,
+  user_status,
+  user_level
+)
+VALUES (
+  $1, $2, $3, $4, $5, $6
+)
+RETURNING user_id, id, user_email, user_password, user_full_name, user_age, user_status, user_level, created_at, update_at, delete_at
 `
 
 type CreateUserParams struct {
-	UserID   uuid.UUID   `json:"user_id"`
-	Username string      `json:"username"`
-	Email    string      `json:"email"`
-	Age      pgtype.Int4 `json:"age"`
-	Password pgtype.Text `json:"password"`
-	Status   pgtype.Int4 `json:"status"`
-	Level    pgtype.Int4 `json:"level"`
+	UserEmail    string `json:"user_email"`
+	UserPassword string `json:"user_password"`
+	UserFullName string `json:"user_full_name"`
+	UserAge      *int32 `json:"user_age"`
+	UserStatus   int32  `json:"user_status"`
+	UserLevel    int32  `json:"user_level"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
-		arg.UserID,
-		arg.Username,
-		arg.Email,
-		arg.Age,
-		arg.Password,
-		arg.Status,
-		arg.Level,
+		arg.UserEmail,
+		arg.UserPassword,
+		arg.UserFullName,
+		arg.UserAge,
+		arg.UserStatus,
+		arg.UserLevel,
 	)
 	var i User
 	err := row.Scan(
 		&i.UserID,
-		&i.Username,
-		&i.Email,
+		&i.ID,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullName,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
 		&i.CreatedAt,
-		&i.Phone,
-		&i.Age,
-		&i.Password,
-		&i.Status,
-		&i.Level,
+		&i.UpdateAt,
+		&i.DeleteAt,
 	)
 	return i, err
 }
 
-const getUserByID = `-- name: GetUserByID :one
-SELECT user_id, username, email, created_at, phone, age, password, status, level FROM users WHERE user_id = $1
+const restoreUser = `-- name: RestoreUser :one
+UPDATE users
+SET
+  user_deleted_at = NULL
+WHERE
+  user_id = $1::uuid
+  AND user_deleted_at IS NOT NULL
+RETURNING user_id, id, user_email, user_password, user_full_name, user_age, user_status, user_level, created_at, update_at, delete_at
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByID, userID)
+func (q *Queries) RestoreUser(ctx context.Context, userID uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, restoreUser, userID)
 	var i User
 	err := row.Scan(
 		&i.UserID,
-		&i.Username,
-		&i.Email,
+		&i.ID,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullName,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
 		&i.CreatedAt,
-		&i.Phone,
-		&i.Age,
-		&i.Password,
-		&i.Status,
-		&i.Level,
+		&i.UpdateAt,
+		&i.DeleteAt,
+	)
+	return i, err
+}
+
+const softDeleteUser = `-- name: SoftDeleteUser :one
+UPDATE users
+SET
+  user_deleted_at = NOW()
+WHERE
+  user_id = $1::uuid
+  AND user_deleted_at IS NULL
+RETURNING user_id, id, user_email, user_password, user_full_name, user_age, user_status, user_level, created_at, update_at, delete_at
+`
+
+func (q *Queries) SoftDeleteUser(ctx context.Context, userID uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, softDeleteUser, userID)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.ID,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullName,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.CreatedAt,
+		&i.UpdateAt,
+		&i.DeleteAt,
+	)
+	return i, err
+}
+
+const trashUsers = `-- name: TrashUsers :one
+DELETE FROM users
+WHERE
+  user_deleted_at IS NOT NULL
+RETURNING user_id, id, user_email, user_password, user_full_name, user_age, user_status, user_level, created_at, update_at, delete_at
+`
+
+func (q *Queries) TrashUsers(ctx context.Context) (User, error) {
+	row := q.db.QueryRow(ctx, trashUsers)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.ID,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullName,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.CreatedAt,
+		&i.UpdateAt,
+		&i.DeleteAt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET
+  user_password = COALESCE($1, user_password),
+  user_full_name = COALESCE($2, user_full_name),
+  user_age = COALESCE($3, user_age),
+  user_status = COALESCE($4, user_status),
+  user_level = COALESCE($5, user_level)
+WHERE
+  user_id = $6
+  AND user_deleted_at IS NULL
+RETURNING user_id, id, user_email, user_password, user_full_name, user_age, user_status, user_level, created_at, update_at, delete_at
+`
+
+type UpdateUserParams struct {
+	UserPassword *string `json:"user_password"`
+	UserFullName *string `json:"user_full_name"`
+	UserAge      *int32  `json:"user_age"`
+	UserStatus   *int32  `json:"user_status"`
+	UserLevel    *int32  `json:"user_level"`
+	UserID       int32   `json:"user_id"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.UserPassword,
+		arg.UserFullName,
+		arg.UserAge,
+		arg.UserStatus,
+		arg.UserLevel,
+		arg.UserID,
+	)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.ID,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullName,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.CreatedAt,
+		&i.UpdateAt,
+		&i.DeleteAt,
 	)
 	return i, err
 }

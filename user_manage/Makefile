@@ -2,7 +2,8 @@ include .env
 export 
 
 MIGRATE_PATH=internal/db/migrations
-CONN_STR=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
+# CONN_STR=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
+CONN_STR=$(DATABASE_URL)
 sqlc:
 	sqlc generate
 

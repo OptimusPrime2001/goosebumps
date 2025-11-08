@@ -19,8 +19,10 @@ func RegisterRoutes(engine *gin.Engine, routes ...Route) {
 	recoverLogger := utils.NewLoggerWithPath(recoverLogPath, "error")
 
 	rateLimiterLogger := utils.NewLoggerWithPath("./internal/logs/rate_limiter.log", "info")
+
 	engine.Use(
 		middlewares.RateLimitMiddleware(rateLimiterLogger),
+		middlewares.CORSMiddleware(),
 		middlewares.LoggerMiddleware(logger),
 		middlewares.RecoveryMiddleware(recoverLogger),
 		middlewares.ApiKeyMiddleware())
@@ -28,4 +30,7 @@ func RegisterRoutes(engine *gin.Engine, routes ...Route) {
 	for _, route := range routes {
 		route.Register(routerGroup)
 	}
+	engine.NoRoute(func(context *gin.Context) {
+		context.JSON(404, gin.H{"error": "404 not found", "path": context.Request.URL.Path})
+	})
 }

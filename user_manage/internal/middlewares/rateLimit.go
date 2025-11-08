@@ -58,12 +58,19 @@ func CleanupRateLimiters() {
 	// TODO: implement rate limit
 }
 
-func RateLimitMiddleware(logger *zerolog.Logger) gin.HandlerFunc {
+func RateLimitMiddleware(rateLimiterLogger *zerolog.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// TODO: implement rate limit
 		ip := getClientIP(ctx)
 		limiter := getRateLimiter(ip)
 		if !limiter.Allow() {
+			rateLimiterLogger.Warn().
+				Str("client_ip", ctx.ClientIP()).
+				Str("path", ctx.Request.URL.Path).
+				Str("method", ctx.Request.Method).
+				Str("host", ctx.Request.Host).
+				Interface("headers", ctx.Request.Header).
+				Msg("rate limit exceeded")
 			ctx.JSON(http.StatusTooManyRequests, gin.H{
 				"code": "429",
 				"msg":  "too many requests",

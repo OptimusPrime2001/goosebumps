@@ -13,8 +13,8 @@ import (
 	"user-manage-backend/internal/routes"
 	"user-manage-backend/internal/validations"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 type Module interface {
@@ -30,8 +30,8 @@ func NewApplication(config *configs.Config) *Application {
 		log.Fatalf("failed to init validations: %v", err)
 	}
 	engine := gin.Default()
-	loadEnv()
-
+	engine.Use(gzip.Gzip(gzip.DefaultCompression))
+	db.InitDb()
 	modules := []Module{
 		NewUserModule(db.DB),
 	}
@@ -72,10 +72,4 @@ func getModuleRoutes(modules []Module) []routes.Route {
 
 	}
 	return routeList
-}
-
-func loadEnv() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Println("failed to load .env:", err)
-	}
 }
